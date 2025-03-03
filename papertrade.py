@@ -38,7 +38,7 @@ def update_stock_data():
         data[key]['worth'] = market_price*data[key]['stock_num']
         data[key]['price'] = market_price
 
-        if data[key]['tspent'] < 0:
+        if data[key]['tspent'] < 0 or data[key]['stock_num'] == 0:
             data[key]['tspent'] = 0
         
         save_to_file(data)
@@ -87,6 +87,8 @@ def sell():
 
 def portfolio():
     update_stock_data()
+    totalspent=0
+    totalworth=0
     for key in data:
         if data[key]['stock_num'] == 0:
             pass
@@ -96,7 +98,13 @@ def portfolio():
             print("The total worth: "+str(data[key]['worth']))
             print("The current price: "+str(data[key]['price']))
             print("The amount spent: "+str(data[key]['tspent']))
+            print("Stocks you own: "+str(data[key]['stock_num']))
             print("~~~~~~~~~~")
+
+            totalspent+=int(data[key]['tspent'])
+            totalworth+=int(data[key]['worth'])
+
+    print("Loss/Gained: "+str(totalworth-totalspent))
 
 
 def buy():
@@ -109,6 +117,7 @@ def main():
     """Main menu loop."""
     while True:
         if data != {}:
+            print("")
             print("Amount of Money: " + str(update_balance()))
         print("\nStock Portfolio Manager")
         print("1: View Portfolio")
