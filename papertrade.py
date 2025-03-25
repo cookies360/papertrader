@@ -2,7 +2,9 @@ import json
 import os
 #import requests
 import yfinance as yf
-
+#from datetime import datetime
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 # Constants
 
 #API_KEY = "2V5PJO3K35LOH0G6"
@@ -53,7 +55,7 @@ def buy_sell(stock_num, choice, name):
             main()
         
         if name not in data:
-            # If the key does not exist, add it with the desired structure
+            # If the key does not exist, add it
             data[name] = {'price': 0, 'worth': 0, 'spent': 0, 'stock_num': 0, 'tspent': 0}
 
 
@@ -90,6 +92,9 @@ def portfolio():
     totalspent=0
     totalworth=0
     for key in data:
+        STOCK_DATA = yf.download(key, period="1d", auto_adjust=True, progress=False)
+        opening_worth = float(STOCK_DATA['Open'].iloc[0]) * float(data[key]['stock_num'])
+
         if data[key]['stock_num'] == 0:
             pass
         else:
@@ -99,13 +104,19 @@ def portfolio():
             print("The current price: "+str(data[key]['price']))
             print("The amount spent: "+str(data[key]['tspent']))
             print("Stocks you own: "+str(data[key]['stock_num']))
+
+            if int(opening_worth)>int(data[key]['worth']):
+                print('Today: '+'loss')
+            elif int(opening_worth)<int(data[key]['worth']):
+                print('Today: '+'gained')
+            print('Total Gain/loss: '+str(int(data[key]['worth'])-str(int(data[key]['tspent']))))
+            
             print("~~~~~~~~~~")
 
             totalspent+=int(data[key]['tspent'])
             totalworth+=int(data[key]['worth'])
 
     print("Loss/Gained: "+str(totalworth-totalspent))
-
 
 def buy():
     name=str(input("What stock do you want: "))
